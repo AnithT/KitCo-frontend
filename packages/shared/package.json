@@ -1,0 +1,42 @@
+{
+  "name": "@kitco/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./order-status": {
+      "types": "./dist/order-status.d.ts",
+      "import": "./dist/order-status.js"
+    },
+    "./format": {
+      "types": "./dist/format.d.ts",
+      "import": "./dist/format.js"
+    },
+    "./phone": {
+      "types": "./dist/phone.d.ts",
+      "import": "./dist/phone.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "clean": "rimraf dist .turbo"
+  },
+  "dependencies": {
+    "date-fns": "^4.1.0",
+    "libphonenumber-js": "^1.11.18"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "rimraf": "^6.0.1"
+  }
+}

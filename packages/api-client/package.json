@@ -1,0 +1,68 @@
+{
+  "name": "@kitco/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./auth": {
+      "types": "./dist/auth.d.ts",
+      "import": "./dist/auth.js"
+    },
+    "./menus": {
+      "types": "./dist/menus.d.ts",
+      "import": "./dist/menus.js"
+    },
+    "./customers": {
+      "types": "./dist/customers.d.ts",
+      "import": "./dist/customers.js"
+    },
+    "./orders": {
+      "types": "./dist/orders.d.ts",
+      "import": "./dist/orders.js"
+    },
+    "./broadcasts": {
+      "types": "./dist/broadcasts.d.ts",
+      "import": "./dist/broadcasts.js"
+    },
+    "./public": {
+      "types": "./dist/public.d.ts",
+      "import": "./dist/public.js"
+    },
+    "./websocket": {
+      "types": "./dist/websocket.d.ts",
+      "import": "./dist/websocket.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "clean": "rimraf dist .turbo"
+  },
+  "dependencies": {
+    "@kitco/shared": "workspace:*",
+    "@tanstack/react-query": "^5.62.7",
+    "axios": "^1.7.9",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "rimraf": "^6.0.1"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  }
+}
