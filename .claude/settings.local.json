@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm install *)",
+      "Bash(pnpm --filter=@kitco/web typecheck)",
+      "Bash(pnpm *)",
+      "Bash(curl -s -o /dev/null -w \"GET / → %{http_code} \\(redirected to %{redirect_url}\\)\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"GET /login → %{http_code}\\\\n\" http://localhost:3000/login)",
+      "Bash(curl -s -o /dev/null -w \"GET /orders → %{http_code}\\\\n\" http://localhost:3000/orders)",
+      "Bash(curl -s -o /dev/null -w \"Backend localhost:8000 → %{http_code}\\\\n\" http://localhost:8000/)",
+      "Bash(curl -s -o /dev/null -w \"/docs %{http_code}\\\\n\" http://localhost:8000/docs)",
+      "Bash(curl -s -o /dev/null -w \"/api/v1/auth/login \\(POST empty\\) %{http_code}\\\\n\" -X POST http://localhost:8000/api/v1/auth/login -H \"Content-Type: application/json\" -d '{}')",
+      "Bash(curl -s -o /dev/null -w \"/openapi.json %{http_code}\\\\n\" http://localhost:8000/openapi.json)",
+      "Bash(curl -s http://localhost:3000/login)",
+      "Read(//tmp/**)",
+      "Bash(curl -s http://localhost:3000/orders)",
+      "Bash(curl -s http://localhost:3000/menus)",
+      "Bash(curl -s http://localhost:3000/customers)",
+      "Bash(curl -s http://localhost:3000/broadcasts)",
+      "Bash(curl -s http://localhost:3000/settings)"
+    ]
+  }
+}
