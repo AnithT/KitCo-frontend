@@ -1,8 +1,16 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Plus, Upload, Search, Users } from 'lucide-react';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import {
+  Plus,
+  Upload,
+  Search,
+  Users,
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { customers, type CustomerOut } from '@kitco/api-client';
 import { formatPhoneDisplay } from '@kitco/shared';
 import { Button } from '@/components/ui/button';
@@ -15,15 +23,35 @@ import { AddCustomerDialog } from '@/components/customers/add-customer-dialog';
 import { BulkImportDialog } from '@/components/customers/bulk-import-dialog';
 import { getApiClient } from '@/lib/api';
 
+const PAGE_SIZE = 50;
+
 export default function CustomersPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [page, setPage] = useState(0);
 
-  const { data, isLoading } = useQuery({
-    queryKey: customers.customerKeys.list({ limit: 500 }),
-    queryFn: () => customers.listCustomers(getApiClient(), { limit: 500 }),
+  // The API caps `limit` at 200 and defaults `opted_in_only` to true, so both
+  // have to be sent explicitly — otherwise opted-out customers are hidden.
+  const params = {
+    skip: page * PAGE_SIZE,
+    limit: PAGE_SIZE,
+    opted_in_only: false,
+  };
+
+  const { data, isLoading, isError, error, isFetching } = useQuery({
+    queryKey: customers.customerKeys.list(params),
+    queryFn: () => customers.listCustomers(getApiClient(), params),
+    placeholderData: keepPreviousData,
   });
+
+  const { data: optedInCount } = useQuery({
+    queryKey: customers.customerKeys.count(),
+    queryFn: () => customers.customerCount(getApiClient()),
+  });
+
+  // A full page implies there is probably at least one more.
+  const hasNextPage = (data?.length ?? 0) === PAGE_SIZE;
 
   const filtered = useMemo(() => {
     if (!data) return [];
@@ -42,8 +70,10 @@ export default function CustomersPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Customers</h1>
           <p className="text-sm text-muted-foreground">
-            {data?.length ?? 0} total ·{' '}
-            {data?.filter((c) => c.is_opted_in).length ?? 0} opted in
+            {data && data.length > 0
+              ? `Showing ${page * PAGE_SIZE + 1}–${page * PAGE_SIZE + data.length}`
+              : 'No results'}
+            {optedInCount ? ` · ${optedInCount.opted_in_count} opted in` : ''}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -72,22 +102,41 @@ export default function CustomersPage() {
         <div className="flex items-center justify-center p-12 text-muted-foreground gap-2">
           <Spinner /> Loading customers…
         </div>
+      ) : isError ? (
+        <EmptyState
+          icon={AlertCircle}
+          title="Couldn’t load customers"
+          description={
+            error instanceof Error ? error.message : 'Something went wrong.'
+          }
+        />
       ) : !data || data.length === 0 ? (
         <EmptyState
           icon={Users}
-          title="No customers yet"
-          description="Add your first customer or paste a CSV to get started."
+          title={page > 0 ? 'No more customers' : 'No customers yet'}
+          description={
+            page > 0
+              ? 'You’ve reached the end of the list.'
+              : 'Add your first customer or paste a CSV to get started.'
+          }
           action={
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setImportOpen(true)}>
-                <Upload className="h-4 w-4" />
-                Bulk import
+            page > 0 ? (
+              <Button variant="outline" onClick={() => setPage((p) => p - 1)}>
+                <ChevronLeft className="h-4 w-4" />
+                Previous page
               </Button>
-              <Button onClick={() => setAddOpen(true)}>
-                <Plus className="h-4 w-4" />
-                Add customer
-              </Button>
-            </div>
+            ) : (
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setImportOpen(true)}>
+                  <Upload className="h-4 w-4" />
+                  Bulk import
+                </Button>
+                <Button onClick={() => setAddOpen(true)}>
+                  <Plus className="h-4 w-4" />
+                  Add customer
+                </Button>
+              </div>
+            )
           }
         />
       ) : (
@@ -110,12 +159,36 @@ export default function CustomersPage() {
                 {filtered.length === 0 && (
                   <tr>
                     <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                      No customers match &ldquo;{query}&rdquo;.
+                      No customers on this page match &ldquo;{query}&rdquo;.
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
+          </div>
+          <div className="flex items-center justify-between gap-3 border-t border-border px-4 py-3">
+            <span className="text-sm text-muted-foreground">
+              Page {page + 1}
+              {isFetching && ' · updating…'}
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                disabled={page === 0 || isFetching}
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                disabled={!hasNextPage || isFetching}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </Card>
       )}
