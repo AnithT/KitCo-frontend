@@ -43,6 +43,7 @@ export function AddCustomerDialog({
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: customers.customerKeys.lists() });
+      qc.invalidateQueries({ queryKey: customers.customerKeys.count() });
       toast({ title: 'Customer added', variant: 'success' });
       setPhone('');
       setName('');

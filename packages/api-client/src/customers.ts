@@ -10,7 +10,11 @@ import type {
 
 const BASE = '/api/v1/customers';
 
+/** `limit` is capped at 200 by the API; larger values are rejected with 422. */
+export const CUSTOMERS_MAX_LIMIT = 200;
+
 export interface ListCustomersParams extends PaginationParams {
+  /** Defaults to `true` server-side — pass `false` to include opted-out customers. */
   opted_in_only?: boolean;
 }
 
@@ -65,8 +69,10 @@ export function bulkImportCustomers(
   });
 }
 
-export function customerCount(client: KitCoClient): Promise<{ count: number }> {
-  return request<{ count: number }>(client, {
+export function customerCount(
+  client: KitCoClient,
+): Promise<{ opted_in_count: number }> {
+  return request<{ opted_in_count: number }>(client, {
     url: `${BASE}/count`,
     method: 'GET',
   });
