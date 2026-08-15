@@ -17,7 +17,9 @@
       "Bash(curl -s http://localhost:3000/menus)",
       "Bash(curl -s http://localhost:3000/customers)",
       "Bash(curl -s http://localhost:3000/broadcasts)",
-      "Bash(curl -s http://localhost:3000/settings)"
+      "Bash(curl -s http://localhost:3000/settings)",
+      "PowerShell(pnpm *)",
+      "Read(//c/PersonalProjects/KitCo//**)"
     ]
   }
 }
